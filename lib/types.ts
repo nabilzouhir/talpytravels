@@ -3,8 +3,10 @@ export type DestinationStatus = "wishlist" | "planned" | "visited";
 export type ActivityCategory =
   | "food"
   | "sightseeing"
+  | "hiking"
   | "adventure"
   | "accommodation"
+  | "chill"
   | "transport"
   | "other";
 

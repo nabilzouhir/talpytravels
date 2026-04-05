@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Destination } from "@/lib/types";
-import { createClient } from "@/lib/supabase-browser";
+import EmojiPicker from "./EmojiPicker";
 
 interface Props {
   destination?: Destination;
@@ -12,57 +12,15 @@ interface Props {
 
 export default function DestinationForm({ destination, action }: Props) {
   const router = useRouter();
-  const [coverUrl, setCoverUrl] = useState(destination?.cover_image_url || "");
-  const [uploading, setUploading] = useState(false);
-
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `covers/${Date.now()}.${ext}`;
-
-    const { error } = await supabase.storage
-      .from("travel-photos")
-      .upload(path, file);
-
-    if (!error) {
-      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/travel-photos/${path}`;
-      setCoverUrl(url);
-    }
-    setUploading(false);
-  }
+  const [emoji, setEmoji] = useState(destination?.cover_image_url || "🌍");
 
   return (
     <form action={action} className="space-y-4">
       {destination && <input type="hidden" name="id" value={destination.id} />}
-      <input type="hidden" name="cover_image_url" value={coverUrl} />
+      <input type="hidden" name="cover_image_url" value={emoji} />
 
-      {/* Cover image */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Immagine di copertina
-        </label>
-        {coverUrl && (
-          <img
-            src={coverUrl}
-            alt="Copertina"
-            className="w-full h-40 object-cover rounded-lg mb-2"
-          />
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          disabled={uploading}
-          className="text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 dark:file:bg-gray-800 dark:file:text-gray-300 hover:file:bg-gray-200 dark:hover:file:bg-gray-700"
-        />
-        {uploading && (
-          <p className="text-xs text-gray-400 mt-1">Caricamento...</p>
-        )}
-      </div>
+      {/* Emoji picker */}
+      <EmojiPicker value={emoji} onChange={setEmoji} />
 
       {/* Name */}
       <div>

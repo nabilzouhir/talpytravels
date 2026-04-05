@@ -82,6 +82,28 @@ export async function createActivity(formData: FormData) {
   revalidatePath(`/destinations/${destinationId}`);
 }
 
+export async function updateActivity(formData: FormData) {
+  const supabase = createClient();
+  const id = formData.get("id") as string;
+  const destinationId = formData.get("destination_id") as string;
+
+  const { error } = await supabase
+    .from("activities")
+    .update({
+      title: formData.get("title") as string,
+      category: formData.get("category") as string,
+      notes: (formData.get("notes") as string) || null,
+      day_number: formData.get("day_number")
+        ? parseInt(formData.get("day_number") as string)
+        : null,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
 export async function toggleActivity(id: string, done: boolean, destinationId: string) {
   const supabase = createClient();
   const { error } = await supabase

@@ -2,6 +2,15 @@ import type { Metadata } from "next";
 import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
 
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "TalpyTravels — I Nostri Viaggi",
   description: "Pianifica e ricorda i nostri viaggi insieme",
@@ -30,7 +39,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased overflow-x-hidden">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

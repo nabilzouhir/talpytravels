@@ -46,19 +46,9 @@ export default async function DestinationDetailPage({
   return (
     <div>
       {/* Hero */}
-      {destination.cover_image_url ? (
-        <div className="-mx-4 -mt-6 h-48 bg-gray-100 dark:bg-gray-800 mb-4">
-          <img
-            src={destination.cover_image_url}
-            alt={destination.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ) : (
-        <div className="-mx-4 -mt-6 h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center mb-4">
-          <span className="text-5xl">🌍</span>
-        </div>
-      )}
+      <div className="-mx-4 -mt-6 h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center mb-4">
+        <span className="text-6xl">{destination.cover_image_url || "🌍"}</span>
+      </div>
 
       {/* Info */}
       <div className="flex items-start justify-between gap-2 mb-1">
