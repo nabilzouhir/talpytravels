@@ -1,6 +1,16 @@
 const MONTHS_IT = [
-  "gen", "feb", "mar", "apr", "mag", "giu",
-  "lug", "ago", "set", "ott", "nov", "dic",
+  "gen",
+  "feb",
+  "mar",
+  "apr",
+  "mag",
+  "giu",
+  "lug",
+  "ago",
+  "set",
+  "ott",
+  "nov",
+  "dic",
 ];
 
 export function formatDateIT(dateStr: string): string {
@@ -10,7 +20,7 @@ export function formatDateIT(dateStr: string): string {
 
 export function formatDateRangeIT(
   start: string | null,
-  end: string | null
+  end: string | null,
 ): string {
   if (!start && !end) return "";
   if (start && !end) return formatDateIT(start);
@@ -33,8 +43,10 @@ export function getStorageUrl(path: string): string {
 export const CATEGORY_LABELS: Record<string, string> = {
   food: "Cibo",
   sightseeing: "Visite",
+  hiking: "Trekking",
   adventure: "Avventura",
   accommodation: "Alloggio",
+  chill: "Chill",
   transport: "Trasporti",
   other: "Altro",
 };
@@ -42,8 +54,10 @@ export const CATEGORY_LABELS: Record<string, string> = {
 export const CATEGORY_ICONS: Record<string, string> = {
   food: "🍽️",
   sightseeing: "🏛️",
+  hiking: "🥾",
   adventure: "🏔️",
   accommodation: "🏨",
+  chill: "😎",
   transport: "🚗",
   other: "📌",
 };
@@ -55,7 +69,9 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  wishlist: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  wishlist:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
   planned: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  visited: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  visited:
+    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
 };
