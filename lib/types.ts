@@ -1,0 +1,53 @@
+export type DestinationStatus = "wishlist" | "planned" | "visited";
+
+export type ActivityCategory =
+  | "food"
+  | "sightseeing"
+  | "adventure"
+  | "accommodation"
+  | "transport"
+  | "other";
+
+export interface Destination {
+  id: string;
+  name: string;
+  country: string;
+  description: string | null;
+  cover_image_url: string | null;
+  status: DestinationStatus;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+  activity_count?: number;
+}
+
+export interface Activity {
+  id: string;
+  destination_id: string;
+  title: string;
+  category: ActivityCategory;
+  notes: string | null;
+  done: boolean;
+  day_number: number | null;
+  created_at: string;
+}
+
+export interface DiaryEntry {
+  id: string;
+  destination_id: string;
+  title: string;
+  body: string;
+  entry_date: string;
+  created_at: string;
+  photos?: Photo[];
+}
+
+export interface Photo {
+  id: string;
+  destination_id: string;
+  diary_entry_id: string | null;
+  storage_path: string;
+  caption: string | null;
+  taken_at: string | null;
+  created_at: string;
+}
