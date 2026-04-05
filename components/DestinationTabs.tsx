@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { Activity, DiaryEntry, Photo } from "@/lib/types";
+import type { Activity, Photo } from "@/lib/types";
 import ActivitiesTab from "./tabs/ActivitiesTab";
 import ItineraryTab from "./tabs/ItineraryTab";
-import DiaryTab from "./tabs/DiaryTab";
 import PhotosTab from "./tabs/PhotosTab";
 
 const TABS = [
   { key: "activities", label: "Attività" },
   { key: "itinerary", label: "Itinerario" },
-  { key: "diary", label: "Diario" },
   { key: "photos", label: "Foto" },
 ] as const;
 
@@ -19,14 +17,12 @@ type TabKey = (typeof TABS)[number]["key"];
 interface Props {
   destinationId: string;
   activities: Activity[];
-  diaryEntries: DiaryEntry[];
   photos: Photo[];
 }
 
 export default function DestinationTabs({
   destinationId,
   activities,
-  diaryEntries,
   photos,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("activities");
@@ -61,13 +57,6 @@ export default function DestinationTabs({
         <ItineraryTab
           destinationId={destinationId}
           activities={activities}
-        />
-      )}
-      {activeTab === "diary" && (
-        <DiaryTab
-          destinationId={destinationId}
-          entries={diaryEntries}
-          photos={photos}
         />
       )}
       {activeTab === "photos" && (

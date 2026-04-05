@@ -15,7 +15,6 @@ export default async function DestinationDetailPage({
   const [
     { data: destination },
     { data: activities },
-    { data: diaryEntries },
     { data: photos },
   ] = await Promise.all([
     supabase.from("destinations").select("*").eq("id", params.id).single(),
@@ -24,11 +23,6 @@ export default async function DestinationDetailPage({
       .select("*")
       .eq("destination_id", params.id)
       .order("created_at", { ascending: true }),
-    supabase
-      .from("diary_entries")
-      .select("*")
-      .eq("destination_id", params.id)
-      .order("entry_date", { ascending: false }),
     supabase
       .from("photos")
       .select("*")
@@ -95,7 +89,6 @@ export default async function DestinationDetailPage({
       <DestinationTabs
         destinationId={destination.id}
         activities={activities || []}
-        diaryEntries={diaryEntries || []}
         photos={photos || []}
       />
     </div>
