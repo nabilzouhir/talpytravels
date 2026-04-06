@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import BottomNav from "@/components/BottomNav";
@@ -9,8 +10,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg text-gray-900 dark:text-white">
-            I Nostri Viaggi
+          <Link href="/" className="flex items-center gap-2 font-bold text-lg text-gray-900 dark:text-white">
+            <Image src="/logo.png" alt="TalpyTravels" width={32} height={32} className="rounded-full" />
+            TalpyTravels
           </Link>
           <div className="flex items-center gap-1">
             <Link

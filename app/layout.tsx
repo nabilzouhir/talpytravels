@@ -14,6 +14,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "TalpyTravels — I Nostri Viaggi",
   description: "Pianifica e ricorda i nostri viaggi insieme",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
