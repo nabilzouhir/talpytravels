@@ -38,19 +38,17 @@ export default async function DestinationDetailPage({
 
   return (
     <div>
-      {/* Back button */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-2 -mt-2 transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Indietro
-      </Link>
-
       {/* Hero */}
-      <div className="-mx-4 h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center mb-4">
+      <div className="-mx-4 -mt-6 h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 relative flex items-center justify-center mb-4">
+        <Link
+          href="/"
+          className="absolute top-3 left-3 inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Indietro
+        </Link>
         <span className="text-6xl">{destination.cover_image_url || "🌍"}</span>
       </div>
 

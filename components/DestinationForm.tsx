@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { Destination } from "@/lib/types";
 import { deleteDestination } from "@/lib/actions";
 import EmojiPicker from "./EmojiPicker";
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function DestinationForm({ destination, action }: Props) {
-  const router = useRouter();
   const [emoji, setEmoji] = useState(destination?.cover_image_url || "🌍");
 
   async function handleDelete() {
@@ -133,19 +131,12 @@ export default function DestinationForm({ destination, action }: Props) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-2">
+      <div className="pt-2">
         <button
           type="submit"
-          className="flex-1 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white font-medium rounded-lg transition-colors"
+          className="w-full px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white font-medium rounded-lg transition-colors"
         >
           Salva
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-        >
-          Annulla
         </button>
       </div>
 
