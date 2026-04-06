@@ -15,6 +15,7 @@ CREATE TABLE destinations (
   status destination_status NOT NULL DEFAULT 'wishlist',
   start_date DATE,
   end_date DATE,
+  budget DOUBLE PRECISION,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -29,6 +30,7 @@ CREATE TABLE activities (
   day_number INTEGER,
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
+  price DOUBLE PRECISION,
   place_name TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

@@ -19,6 +19,9 @@ export async function createDestination(formData: FormData) {
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
       cover_image_url: (formData.get("cover_image_url") as string) || null,
+      budget: formData.get("budget")
+        ? parseFloat(formData.get("budget") as string)
+        : null,
     })
     .select("id")
     .single();
@@ -43,6 +46,9 @@ export async function updateDestination(formData: FormData) {
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
       cover_image_url: (formData.get("cover_image_url") as string) || null,
+      budget: formData.get("budget")
+        ? parseFloat(formData.get("budget") as string)
+        : null,
     })
     .eq("id", id);
 
@@ -81,6 +87,9 @@ export async function createActivity(formData: FormData) {
     longitude: formData.get("longitude")
       ? parseFloat(formData.get("longitude") as string)
       : null,
+    price: formData.get("price")
+      ? parseFloat(formData.get("price") as string)
+      : null,
     place_name: (formData.get("place_name") as string) || null,
   });
 
@@ -108,6 +117,9 @@ export async function updateActivity(formData: FormData) {
         : null,
       longitude: formData.get("longitude")
         ? parseFloat(formData.get("longitude") as string)
+        : null,
+      price: formData.get("price")
+        ? parseFloat(formData.get("price") as string)
         : null,
       place_name: (formData.get("place_name") as string) || null,
     })

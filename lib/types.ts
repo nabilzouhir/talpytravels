@@ -21,6 +21,7 @@ export interface Destination {
   end_date: string | null;
   created_at: string;
   activity_count?: number;
+  budget: number | null;
 }
 
 export interface Activity {
@@ -31,6 +32,7 @@ export interface Activity {
   notes: string | null;
   done: boolean;
   day_number: number | null;
+  price: number | null;
   latitude: number | null;
   longitude: number | null;
   place_name: string | null;

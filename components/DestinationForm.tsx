@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { Destination } from "@/lib/types";
+import { deleteDestination } from "@/lib/actions";
 import EmojiPicker from "./EmojiPicker";
 
 interface Props {
@@ -11,8 +11,13 @@ interface Props {
 }
 
 export default function DestinationForm({ destination, action }: Props) {
-  const router = useRouter();
   const [emoji, setEmoji] = useState(destination?.cover_image_url || "🌍");
+
+  async function handleDelete() {
+    if (!destination) return;
+    if (!confirm("Sei sicuro di voler eliminare questa destinazione?")) return;
+    await deleteDestination(destination.id);
+  }
 
   return (
     <form action={action} className="space-y-4">
@@ -106,22 +111,45 @@ export default function DestinationForm({ destination, action }: Props) {
         </div>
       </div>
 
+      {/* Budget */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Budget (opzionale)
+        </label>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
+          <input
+            name="budget"
+            type="number"
+            min="0"
+            step="0.01"
+            defaultValue={destination?.budget ?? ""}
+            placeholder="es. 1500.00"
+            className="w-full pl-7 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
       {/* Actions */}
-      <div className="flex gap-3 pt-2">
+      <div className="pt-2">
         <button
           type="submit"
-          className="flex-1 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white font-medium rounded-lg transition-colors"
+          className="w-full px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white font-medium rounded-lg transition-colors"
         >
           Salva
         </button>
+      </div>
+
+      {/* Delete button (only in edit mode) */}
+      {destination && (
         <button
           type="button"
-          onClick={() => router.back()}
-          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          onClick={handleDelete}
+          className="w-full py-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors font-medium"
         >
-          Annulla
+          Elimina destinazione
         </button>
-      </div>
+      )}
     </form>
   );
 }
