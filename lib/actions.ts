@@ -75,6 +75,13 @@ export async function createActivity(formData: FormData) {
     day_number: formData.get("day_number")
       ? parseInt(formData.get("day_number") as string)
       : null,
+    latitude: formData.get("latitude")
+      ? parseFloat(formData.get("latitude") as string)
+      : null,
+    longitude: formData.get("longitude")
+      ? parseFloat(formData.get("longitude") as string)
+      : null,
+    place_name: (formData.get("place_name") as string) || null,
   });
 
   if (error) throw new Error(error.message);
@@ -96,6 +103,13 @@ export async function updateActivity(formData: FormData) {
       day_number: formData.get("day_number")
         ? parseInt(formData.get("day_number") as string)
         : null,
+      latitude: formData.get("latitude")
+        ? parseFloat(formData.get("latitude") as string)
+        : null,
+      longitude: formData.get("longitude")
+        ? parseFloat(formData.get("longitude") as string)
+        : null,
+      place_name: (formData.get("place_name") as string) || null,
     })
     .eq("id", id);
 
