@@ -21,12 +21,14 @@ interface Props {
   destinationId: string;
   activities: Activity[];
   photos: Photo[];
+  budget?: number | null;
 }
 
 export default function DestinationTabs({
   destinationId,
   activities,
   photos,
+  budget,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("activities");
 
@@ -55,6 +57,7 @@ export default function DestinationTabs({
           <ActivitiesTab
             destinationId={destinationId}
             activities={activities}
+            budget={budget}
           />
         )}
         {activeTab === "itinerary" && (

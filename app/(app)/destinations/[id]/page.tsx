@@ -3,7 +3,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
 import { formatDateRangeIT, STATUS_COLORS, STATUS_LABELS } from "@/lib/utils";
 import DestinationTabs from "@/components/DestinationTabs";
-import DeleteDestinationButton from "@/components/DeleteDestinationButton";
 
 export default async function DestinationDetailPage({
   params,
@@ -82,7 +81,6 @@ export default async function DestinationDetailPage({
         >
           Modifica
         </Link>
-        <DeleteDestinationButton id={destination.id} />
       </div>
 
       {/* Tabs */}
@@ -90,6 +88,7 @@ export default async function DestinationDetailPage({
         destinationId={destination.id}
         activities={activities || []}
         photos={photos || []}
+        budget={destination.budget}
       />
     </div>
   );
