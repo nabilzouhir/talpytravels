@@ -9,6 +9,7 @@ import {
   deleteActivity,
 } from "@/lib/actions";
 import { CATEGORY_LABELS, CATEGORY_ICONS } from "@/lib/utils";
+import PlacePicker from "@/components/PlacePicker";
 
 interface Props {
   destinationId: string;
@@ -113,6 +114,11 @@ export default function ActivitiesTab({ destinationId, activities }: Props) {
             className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
           />
         </div>
+        <PlacePicker
+          defaultPlaceName={editingActivity?.place_name}
+          defaultLatitude={editingActivity?.latitude}
+          defaultLongitude={editingActivity?.longitude}
+        />
         <div className="flex gap-2">
           <button
             type="submit"
@@ -194,6 +200,11 @@ export default function ActivitiesTab({ destinationId, activities }: Props) {
                   {activity.notes && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 break-words">
                       {activity.notes}
+                    </p>
+                  )}
+                  {activity.place_name && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      📍 {activity.place_name}
                     </p>
                   )}
                   {activity.day_number && (

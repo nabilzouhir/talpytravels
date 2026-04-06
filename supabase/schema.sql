@@ -27,6 +27,9 @@ CREATE TABLE activities (
   notes TEXT,
   done BOOLEAN NOT NULL DEFAULT false,
   day_number INTEGER,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  place_name TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

@@ -31,6 +31,9 @@ export interface Activity {
   notes: string | null;
   done: boolean;
   day_number: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  place_name: string | null;
   created_at: string;
 }
 

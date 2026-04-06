@@ -63,6 +63,11 @@ export default function ItineraryTab({ destinationId, activities }: Props) {
                   }`}
                 >
                   {activity.title}
+                  {activity.place_name && (
+                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">
+                      📍
+                    </span>
+                  )}
                 </span>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
