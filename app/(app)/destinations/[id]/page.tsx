@@ -131,6 +131,7 @@ export default async function DestinationDetailPage({
         flights={flights || []}
         budget={destination.budget}
         startDate={destination.start_date}
+        endDate={destination.end_date}
       />
     </div>
   );
