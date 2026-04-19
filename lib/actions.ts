@@ -168,6 +168,138 @@ export async function deleteActivity(id: string, destinationId: string) {
   revalidatePath(`/destinations/${destinationId}`);
 }
 
+export async function reorderActivities(
+  orderedIds: string[],
+  destinationId: string,
+) {
+  const supabase = createClient();
+  const updates = orderedIds.map((id, index) =>
+    supabase.from("activities").update({ sort_order: index }).eq("id", id),
+  );
+  const results = await Promise.all(updates);
+  const firstError = results.find((r) => r.error);
+  if (firstError?.error) throw new Error(firstError.error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
+// ─── Flights ─────────────────────────────────────────────
+
+export async function createFlight(formData: FormData) {
+  const supabase = createClient();
+  const destinationId = formData.get("destination_id") as string;
+
+  const { error } = await supabase.from("flights").insert({
+    destination_id: destinationId,
+    airline: (formData.get("airline") as string) || null,
+    flight_number: (formData.get("flight_number") as string) || null,
+    departure_airport: (formData.get("departure_airport") as string) || null,
+    arrival_airport: (formData.get("arrival_airport") as string) || null,
+    departure_at: (formData.get("departure_at") as string) || null,
+    arrival_at: (formData.get("arrival_at") as string) || null,
+    confirmation_code: (formData.get("confirmation_code") as string) || null,
+    price: formData.get("price")
+      ? parseFloat(formData.get("price") as string)
+      : null,
+    paid_by: (formData.get("paid_by") as string) || null,
+    notes: (formData.get("notes") as string) || null,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
+export async function updateFlight(formData: FormData) {
+  const supabase = createClient();
+  const id = formData.get("id") as string;
+  const destinationId = formData.get("destination_id") as string;
+
+  const { error } = await supabase
+    .from("flights")
+    .update({
+      airline: (formData.get("airline") as string) || null,
+      flight_number: (formData.get("flight_number") as string) || null,
+      departure_airport: (formData.get("departure_airport") as string) || null,
+      arrival_airport: (formData.get("arrival_airport") as string) || null,
+      departure_at: (formData.get("departure_at") as string) || null,
+      arrival_at: (formData.get("arrival_at") as string) || null,
+      confirmation_code: (formData.get("confirmation_code") as string) || null,
+      price: formData.get("price")
+        ? parseFloat(formData.get("price") as string)
+        : null,
+      paid_by: (formData.get("paid_by") as string) || null,
+      notes: (formData.get("notes") as string) || null,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
+export async function deleteFlight(id: string, destinationId: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("flights").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
+// ─── Attachments ─────────────────────────────────────────
+
+export async function createAttachment(formData: FormData) {
+  const supabase = createClient();
+  const activityId = formData.get("activity_id") as string;
+  const destinationId = formData.get("destination_id") as string;
+  const file = formData.get("file") as File;
+
+  if (!file || file.size === 0) {
+    throw new Error("Nessun file selezionato");
+  }
+
+  const ext = file.name.split(".").pop() || "bin";
+  const storagePath = `activity-${activityId}/${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("travel-photos")
+    .upload(storagePath, file, {
+      contentType: file.type,
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { error } = await supabase.from("attachments").insert({
+    activity_id: activityId,
+    storage_path: storagePath,
+    filename: file.name,
+    mime_type: file.type || "application/octet-stream",
+    size_bytes: file.size,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
+export async function deleteAttachment(
+  id: string,
+  storagePath: string,
+  destinationId: string,
+) {
+  const supabase = createClient();
+
+  await supabase.storage.from("travel-photos").remove([storagePath]);
+  const { error } = await supabase.from("attachments").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/destinations/${destinationId}`);
+}
+
 // ─── Diary ───────────────────────────────────────────────
 
 export async function createDiaryEntry(formData: FormData) {

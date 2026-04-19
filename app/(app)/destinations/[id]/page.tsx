@@ -15,6 +15,8 @@ export default async function DestinationDetailPage({
     { data: destination },
     { data: activities },
     { data: photos },
+    { data: flights },
+    { data: attachments },
   ] = await Promise.all([
     supabase.from("destinations").select("*").eq("id", params.id).single(),
     supabase
@@ -27,9 +29,38 @@ export default async function DestinationDetailPage({
       .select("*")
       .eq("destination_id", params.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("flights")
+      .select("*")
+      .eq("destination_id", params.id)
+      .order("departure_at", { ascending: true, nullsFirst: false }),
+    supabase
+      .from("attachments")
+      .select("*, activities!inner(destination_id)")
+      .eq("activities.destination_id", params.id)
+      .order("created_at", { ascending: true }),
   ]);
 
   if (!destination) notFound();
+
+  // Attach attachments to their activities
+  const attachmentsByActivity: Record<string, typeof attachments> = {};
+  (attachments || []).forEach((att) => {
+    if (!attachmentsByActivity[att.activity_id]) {
+      attachmentsByActivity[att.activity_id] = [];
+    }
+    attachmentsByActivity[att.activity_id]!.push(att);
+  });
+  const activitiesWithAttachments = (activities || [])
+    .map((a) => ({
+      ...a,
+      attachments: attachmentsByActivity[a.id] || [],
+    }))
+    .sort((a, b) => {
+      const so = (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      if (so !== 0) return so;
+      return a.created_at.localeCompare(b.created_at);
+    });
 
   const dateRange = formatDateRangeIT(
     destination.start_date,
@@ -95,9 +126,11 @@ export default async function DestinationDetailPage({
       {/* Tabs */}
       <DestinationTabs
         destinationId={destination.id}
-        activities={activities || []}
+        activities={activitiesWithAttachments}
         photos={photos || []}
+        flights={flights || []}
         budget={destination.budget}
+        startDate={destination.start_date}
       />
     </div>
   );

@@ -33,6 +33,35 @@ CREATE TABLE activities (
   price DOUBLE PRECISION,
   paid_by TEXT CHECK (paid_by IN ('pesciolino', 'talpina')),
   place_name TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Flights table
+CREATE TABLE flights (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  destination_id UUID NOT NULL REFERENCES destinations(id) ON DELETE CASCADE,
+  airline TEXT,
+  flight_number TEXT,
+  departure_airport TEXT,
+  arrival_airport TEXT,
+  departure_at TIMESTAMPTZ,
+  arrival_at TIMESTAMPTZ,
+  confirmation_code TEXT,
+  price DOUBLE PRECISION,
+  paid_by TEXT CHECK (paid_by IN ('pesciolino', 'talpina')),
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Activity attachments (images, PDFs)
+CREATE TABLE attachments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  activity_id UUID NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+  storage_path TEXT NOT NULL,
+  filename TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size_bytes INTEGER,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -62,18 +91,24 @@ CREATE INDEX idx_activities_destination ON activities(destination_id);
 CREATE INDEX idx_diary_entries_destination ON diary_entries(destination_id);
 CREATE INDEX idx_photos_destination ON photos(destination_id);
 CREATE INDEX idx_photos_diary_entry ON photos(diary_entry_id);
+CREATE INDEX idx_flights_destination ON flights(destination_id);
+CREATE INDEX idx_attachments_activity ON attachments(activity_id);
 
 -- Disable RLS (private app)
 ALTER TABLE destinations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diary_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE flights ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attachments ENABLE ROW LEVEL SECURITY;
 
 -- Allow all operations (no multi-user concerns)
 CREATE POLICY "Allow all on destinations" ON destinations FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on activities" ON activities FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on diary_entries" ON diary_entries FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on photos" ON photos FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on flights" ON flights FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all on attachments" ON attachments FOR ALL USING (true) WITH CHECK (true);
 
 -- Create storage bucket for photos
 INSERT INTO storage.buckets (id, name, public)

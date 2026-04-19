@@ -2,14 +2,15 @@
 
 import type { Activity } from "@/lib/types";
 import { updateActivityDay } from "@/lib/actions";
-import { CATEGORY_ICONS } from "@/lib/utils";
+import { CATEGORY_ICONS, formatDayWithDate } from "@/lib/utils";
 
 interface Props {
   destinationId: string;
   activities: Activity[];
+  startDate?: string | null;
 }
 
-export default function ItineraryTab({ destinationId, activities }: Props) {
+export default function ItineraryTab({ destinationId, activities, startDate }: Props) {
   const assigned = activities.filter((a) => a.day_number !== null);
   const unassigned = activities.filter((a) => a.day_number === null);
 
@@ -44,7 +45,7 @@ export default function ItineraryTab({ destinationId, activities }: Props) {
       {Array.from({ length: maxDay }, (_, i) => i + 1).map((dayNum) => (
         <div key={dayNum} className="mb-6">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-            Giorno {dayNum}
+            {formatDayWithDate(startDate, dayNum) || `Giorno ${dayNum}`}
           </h3>
           <div className="space-y-1 pl-3 border-l-2 border-accent-200 dark:border-accent-800">
             {(days[dayNum] || []).map((activity) => (
