@@ -56,44 +56,6 @@ function MapContent({ activities }: Props) {
     }
   }, [map, geoActivities]);
 
-  // Draw polylines for same-day activities
-  useEffect(() => {
-    if (!map) return;
-
-    const polylines: google.maps.Polyline[] = [];
-
-    const dayGroups: Record<number, Activity[]> = {};
-    geoActivities.forEach((a) => {
-      if (a.day_number != null) {
-        if (!dayGroups[a.day_number]) dayGroups[a.day_number] = [];
-        dayGroups[a.day_number].push(a);
-      }
-    });
-
-    Object.entries(dayGroups).forEach(([day, dayActivities]) => {
-      if (dayActivities.length < 2) return;
-
-      const path = dayActivities.map((a) => ({
-        lat: a.latitude!,
-        lng: a.longitude!,
-      }));
-
-      const polyline = new google.maps.Polyline({
-        path,
-        strokeColor: getDayColor(parseInt(day)),
-        strokeOpacity: 0.8,
-        strokeWeight: 3,
-        map,
-      });
-
-      polylines.push(polyline);
-    });
-
-    return () => {
-      polylines.forEach((p) => p.setMap(null));
-    };
-  }, [map, geoActivities]);
-
   // Get unique days for legend
   const uniqueDays = Array.from(
     new Set(

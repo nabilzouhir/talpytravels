@@ -39,6 +39,34 @@ export interface Activity {
   latitude: number | null;
   longitude: number | null;
   place_name: string | null;
+  sort_order: number;
+  created_at: string;
+  attachments?: Attachment[];
+}
+
+export interface Flight {
+  id: string;
+  destination_id: string;
+  airline: string | null;
+  flight_number: string | null;
+  departure_airport: string | null;
+  arrival_airport: string | null;
+  departure_at: string | null;
+  arrival_at: string | null;
+  confirmation_code: string | null;
+  price: number | null;
+  paid_by: Payer | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface Attachment {
+  id: string;
+  activity_id: string;
+  storage_path: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number | null;
   created_at: string;
 }
 

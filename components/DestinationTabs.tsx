@@ -1,18 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import type { Activity, Photo } from "@/lib/types";
+import type { Activity, Flight, Photo } from "@/lib/types";
 import GoogleMapsProvider from "./GoogleMapsProvider";
 import ActivitiesTab from "./tabs/ActivitiesTab";
 import ItineraryTab from "./tabs/ItineraryTab";
 import MapTab from "./tabs/MapTab";
 import ExpensesTab from "./tabs/ExpensesTab";
+import FlightsTab from "./tabs/FlightsTab";
+import IdeasTab from "./tabs/IdeasTab";
 import PhotosTab from "./tabs/PhotosTab";
 
 const TABS = [
   { key: "activities", label: "Attività" },
+  { key: "ideas", label: "Idee" },
   { key: "itinerary", label: "Itinerario" },
   { key: "mappa", label: "Mappa" },
+  { key: "flights", label: "Voli" },
   { key: "expenses", label: "Spese" },
   { key: "photos", label: "Foto" },
 ] as const;
@@ -23,14 +27,18 @@ interface Props {
   destinationId: string;
   activities: Activity[];
   photos: Photo[];
+  flights: Flight[];
   budget?: number | null;
+  startDate?: string | null;
 }
 
 export default function DestinationTabs({
   destinationId,
   activities,
   photos,
+  flights,
   budget,
+  startDate,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("activities");
 
@@ -60,16 +68,26 @@ export default function DestinationTabs({
             destinationId={destinationId}
             activities={activities}
             budget={budget}
+            startDate={startDate}
           />
+        )}
+        {activeTab === "ideas" && (
+          <IdeasTab destinationId={destinationId} activities={activities} />
         )}
         {activeTab === "itinerary" && (
           <ItineraryTab
             destinationId={destinationId}
             activities={activities}
+            startDate={startDate}
           />
         )}
         {activeTab === "mappa" && <MapTab activities={activities} />}
-        {activeTab === "expenses" && <ExpensesTab activities={activities} />}
+        {activeTab === "flights" && (
+          <FlightsTab destinationId={destinationId} flights={flights} />
+        )}
+        {activeTab === "expenses" && (
+          <ExpensesTab activities={activities} flights={flights} />
+        )}
         {activeTab === "photos" && (
           <PhotosTab destinationId={destinationId} photos={photos} />
         )}

@@ -18,6 +18,29 @@ export function formatDateIT(dateStr: string): string {
   return `${d.getDate()} ${MONTHS_IT[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+export function dateForDay(
+  startDate: string | null | undefined,
+  dayNumber: number | null | undefined,
+): string | null {
+  if (!startDate || dayNumber == null || dayNumber < 1) return null;
+  const d = new Date(startDate + "T00:00:00");
+  d.setDate(d.getDate() + (dayNumber - 1));
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function formatDayWithDate(
+  startDate: string | null | undefined,
+  dayNumber: number | null | undefined,
+): string {
+  if (dayNumber == null) return "";
+  const iso = dateForDay(startDate, dayNumber);
+  if (!iso) return `Giorno ${dayNumber}`;
+  return `Giorno ${dayNumber} · ${formatDateIT(iso)}`;
+}
+
 export function formatDateRangeIT(
   start: string | null,
   end: string | null,
