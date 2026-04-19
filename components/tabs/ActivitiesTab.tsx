@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Activity, ActivityCategory } from "@/lib/types";
 import {
   createActivity,
   updateActivity,
   toggleActivity,
   deleteActivity,
-  reorderActivities,
 } from "@/lib/actions";
 import {
   CATEGORY_LABELS,
@@ -15,32 +14,17 @@ import {
   PAYER_LABELS,
   PAYER_ICONS,
   formatDayWithDate,
+  dateForDay,
 } from "@/lib/utils";
 import PlacePicker from "@/components/PlacePicker";
 import AttachmentsSection from "@/components/AttachmentsSection";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
   destinationId: string;
   activities: Activity[];
   budget?: number | null;
   startDate?: string | null;
+  endDate?: string | null;
 }
 
 const CATEGORIES: ActivityCategory[] = [
@@ -80,198 +64,11 @@ function LinkifiedText({ text }: { text: string }) {
   );
 }
 
-interface RowProps {
-  activity: Activity;
-  onOpen: (a: Activity) => void;
-  onToggle: (a: Activity, e: React.MouseEvent) => void;
-  startDate?: string | null;
-}
-
-function SortableActivityRow({ activity, onOpen, onToggle, startDate }: RowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: activity.id });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      onClick={() => onOpen(activity)}
-      className="flex items-start gap-1 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer active:bg-gray-100 dark:active:bg-gray-800 transition-colors"
-    >
-      {/* Drag handle */}
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        onClick={(e) => e.stopPropagation()}
-        className="mt-0.5 text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing touch-none shrink-0 px-0.5"
-        title="Trascina per riordinare"
-        aria-label="Trascina per riordinare"
-      >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M7 4a1 1 0 100 2 1 1 0 000-2zm0 5a1 1 0 100 2 1 1 0 000-2zm0 5a1 1 0 100 2 1 1 0 000-2zm6-10a1 1 0 100 2 1 1 0 000-2zm0 5a1 1 0 100 2 1 1 0 000-2zm0 5a1 1 0 100 2 1 1 0 000-2z" />
-        </svg>
-      </button>
-
-      <button
-        onClick={(e) => onToggle(activity, e)}
-        className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-          activity.done
-            ? "bg-accent-500 border-accent-500 text-white"
-            : "border-gray-300 dark:border-gray-600 hover:border-accent-400"
-        }`}
-      >
-        {activity.done && (
-          <svg
-            className="w-3 h-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        )}
-      </button>
-      <div className="flex-1 min-w-0">
-        <p
-          className={`text-sm break-words ${
-            activity.done
-              ? "line-through text-gray-400 dark:text-gray-500"
-              : "text-gray-900 dark:text-white"
-          }`}
-        >
-          {activity.title}
-        </p>
-        {activity.notes && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 break-words">
-            <LinkifiedText text={activity.notes} />
-          </p>
-        )}
-        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          {activity.place_name && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              📍 {activity.place_name}
-            </span>
-          )}
-          {activity.price != null && activity.price > 0 && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              💰 €{activity.price.toFixed(2)}
-              {activity.paid_by && (
-                <>
-                  {" "}
-                  · {PAYER_ICONS[activity.paid_by]} {PAYER_LABELS[activity.paid_by]}
-                </>
-              )}
-            </span>
-          )}
-          {activity.attachments && activity.attachments.length > 0 && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              📎 {activity.attachments.length}
-            </span>
-          )}
-        </div>
-        {activity.day_number && (
-          <p className="text-xs text-accent-500 dark:text-accent-400 mt-0.5">
-            {formatDayWithDate(startDate, activity.day_number) ||
-              `Giorno ${activity.day_number}`}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface CategoryGroupProps {
-  category: string;
-  items: Activity[];
-  onOpen: (a: Activity) => void;
-  onToggle: (a: Activity, e: React.MouseEvent) => void;
-  onReorder: (ids: string[]) => void;
-  startDate?: string | null;
-}
-
-function CategoryGroup({
-  category,
-  items,
-  onOpen,
-  onToggle,
-  onReorder,
-  startDate,
-}: CategoryGroupProps) {
-  // Local mirror so dragging feels instant while the server revalidates
-  const [localItems, setLocalItems] = useState(items);
-
-  // Keep local state in sync when props change (e.g., after server revalidation)
-  useEffect(() => {
-    setLocalItems(items);
-  }, [items]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = localItems.findIndex((i) => i.id === active.id);
-    const newIndex = localItems.findIndex((i) => i.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const next = arrayMove(localItems, oldIndex, newIndex);
-    setLocalItems(next);
-    onReorder(next.map((a) => a.id));
-  }
-
-  return (
-    <div className="mb-4">
-      <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-        {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
-      </h3>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={localItems.map((i) => i.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-1">
-            {localItems.map((activity) => (
-              <SortableActivityRow
-                key={activity.id}
-                activity={activity}
-                onOpen={onOpen}
-                onToggle={onToggle}
-                startDate={startDate}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
-    </div>
-  );
+// Diff in whole days between two ISO date strings (YYYY-MM-DD)
+function daysBetween(start: string, target: string): number {
+  const s = new Date(start + "T00:00:00");
+  const t = new Date(target + "T00:00:00");
+  return Math.round((t.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export default function ActivitiesTab({
@@ -279,11 +76,12 @@ export default function ActivitiesTab({
   activities,
   budget,
   startDate,
+  endDate,
 }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
 
-  // Keep editingActivity in sync with fresh data (so attachments list refreshes)
+  // Keep editingActivity in sync with fresh data (so attachments refresh)
   const liveEditing =
     editingActivity &&
     activities.find((a) => a.id === editingActivity.id)
@@ -297,11 +95,6 @@ export default function ActivitiesTab({
       return acc;
     },
     {} as Record<string, Activity[]>,
-  );
-
-  const maxDay = activities.reduce(
-    (max, a) => Math.max(max, a.day_number ?? 0),
-    0,
   );
 
   const totalPrice = activities.reduce((sum, a) => sum + (a.price ?? 0), 0);
@@ -318,8 +111,34 @@ export default function ActivitiesTab({
     setEditingActivity(null);
   }
 
-  async function handleReorder(ids: string[]) {
-    await reorderActivities(ids, destinationId);
+  // Date picker only when the trip has both start & end dates
+  const hasTripRange = !!(startDate && endDate);
+
+  // Default date for editing: compute from existing day_number if present
+  const defaultDate = liveEditing
+    ? dateForDay(startDate, liveEditing.day_number) || ""
+    : "";
+
+  async function handleSubmit(formData: FormData) {
+    // If date picker is in use, convert selected date → day_number
+    if (hasTripRange) {
+      const d = formData.get("activity_date") as string;
+      if (d && startDate) {
+        const dayNum = daysBetween(startDate, d) + 1;
+        formData.set("day_number", String(dayNum));
+      } else {
+        formData.set("day_number", "");
+      }
+      formData.delete("activity_date");
+    }
+
+    if (liveEditing) {
+      await updateActivity(formData);
+    } else {
+      await createActivity(formData);
+    }
+    setShowForm(false);
+    setEditingActivity(null);
   }
 
   // Edit or Create form
@@ -327,15 +146,7 @@ export default function ActivitiesTab({
     const isEditing = !!liveEditing;
     return (
       <form
-        action={async (formData) => {
-          if (isEditing) {
-            await updateActivity(formData);
-          } else {
-            await createActivity(formData);
-          }
-          setShowForm(false);
-          setEditingActivity(null);
-        }}
+        action={handleSubmit}
         className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 space-y-3"
       >
         <input type="hidden" name="destination_id" value={destinationId} />
@@ -368,21 +179,24 @@ export default function ActivitiesTab({
           defaultValue={liveEditing?.notes || ""}
           className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm resize-none"
         />
+
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-              Giorno (opzionale)
-            </label>
-            <input
-              name="day_number"
-              type="number"
-              min="1"
-              placeholder={`es. ${maxDay + 1 || 1}`}
-              defaultValue={liveEditing?.day_number ?? ""}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
-            />
-          </div>
-          <div>
+          {hasTripRange && (
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Data (opzionale)
+              </label>
+              <input
+                name="activity_date"
+                type="date"
+                min={startDate!}
+                max={endDate!}
+                defaultValue={defaultDate}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+              />
+            </div>
+          )}
+          <div className={hasTripRange ? "" : "col-span-2"}>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
               Prezzo (opzionale)
             </label>
@@ -397,6 +211,7 @@ export default function ActivitiesTab({
             />
           </div>
         </div>
+
         <div>
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             Pagato da (opzionale)
@@ -498,15 +313,92 @@ export default function ActivitiesTab({
       )}
 
       {Object.entries(grouped).map(([category, items]) => (
-        <CategoryGroup
-          key={category}
-          category={category}
-          items={items}
-          onOpen={setEditingActivity}
-          onToggle={handleToggle}
-          onReorder={handleReorder}
-          startDate={startDate}
-        />
+        <div key={category} className="mb-4">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+            {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
+          </h3>
+          <div className="space-y-1">
+            {items.map((activity) => (
+              <div
+                key={activity.id}
+                onClick={() => setEditingActivity(activity)}
+                className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer active:bg-gray-100 dark:active:bg-gray-800 transition-colors"
+              >
+                <button
+                  onClick={(e) => handleToggle(activity, e)}
+                  className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    activity.done
+                      ? "bg-accent-500 border-accent-500 text-white"
+                      : "border-gray-300 dark:border-gray-600 hover:border-accent-400"
+                  }`}
+                >
+                  {activity.done && (
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={`text-sm break-words ${
+                      activity.done
+                        ? "line-through text-gray-400 dark:text-gray-500"
+                        : "text-gray-900 dark:text-white"
+                    }`}
+                  >
+                    {activity.title}
+                  </p>
+                  {activity.notes && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 break-words">
+                      <LinkifiedText text={activity.notes} />
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    {activity.place_name && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        📍 {activity.place_name}
+                      </span>
+                    )}
+                    {activity.price != null && activity.price > 0 && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        💰 €{activity.price.toFixed(2)}
+                        {activity.paid_by && (
+                          <>
+                            {" "}
+                            · {PAYER_ICONS[activity.paid_by]}{" "}
+                            {PAYER_LABELS[activity.paid_by]}
+                          </>
+                        )}
+                      </span>
+                    )}
+                    {activity.attachments &&
+                      activity.attachments.length > 0 && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          📎 {activity.attachments.length}
+                        </span>
+                      )}
+                  </div>
+                  {activity.day_number && (
+                    <p className="text-xs text-accent-500 dark:text-accent-400 mt-0.5">
+                      {formatDayWithDate(startDate, activity.day_number) ||
+                        `Giorno ${activity.day_number}`}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       ))}
 
       <button

@@ -8,12 +8,10 @@ import ItineraryTab from "./tabs/ItineraryTab";
 import MapTab from "./tabs/MapTab";
 import ExpensesTab from "./tabs/ExpensesTab";
 import FlightsTab from "./tabs/FlightsTab";
-import IdeasTab from "./tabs/IdeasTab";
 import PhotosTab from "./tabs/PhotosTab";
 
 const TABS = [
   { key: "activities", label: "Attività" },
-  { key: "ideas", label: "Idee" },
   { key: "itinerary", label: "Itinerario" },
   { key: "mappa", label: "Mappa" },
   { key: "flights", label: "Voli" },
@@ -30,6 +28,7 @@ interface Props {
   flights: Flight[];
   budget?: number | null;
   startDate?: string | null;
+  endDate?: string | null;
 }
 
 export default function DestinationTabs({
@@ -39,19 +38,20 @@ export default function DestinationTabs({
   flights,
   budget,
   startDate,
+  endDate,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("activities");
 
   return (
     <GoogleMapsProvider>
       <div>
-        {/* Tab pills */}
-        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mb-4 overflow-x-auto">
+        {/* Tab pills — horizontal scroll on overflow, natural width per tab */}
+        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mb-4 overflow-x-auto no-scrollbar">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 min-w-0 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+              className={`shrink-0 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                 activeTab === tab.key
                   ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
@@ -69,10 +69,8 @@ export default function DestinationTabs({
             activities={activities}
             budget={budget}
             startDate={startDate}
+            endDate={endDate}
           />
-        )}
-        {activeTab === "ideas" && (
-          <IdeasTab destinationId={destinationId} activities={activities} />
         )}
         {activeTab === "itinerary" && (
           <ItineraryTab
