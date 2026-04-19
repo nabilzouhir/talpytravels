@@ -17,6 +17,9 @@ COPY . .
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+# Raise Node heap size — "Collecting build traces" OOMs on small VMs
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 RUN npm run build
 
 # --- Production ---
