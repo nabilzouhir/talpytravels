@@ -90,6 +90,7 @@ export async function createActivity(formData: FormData) {
     price: formData.get("price")
       ? parseFloat(formData.get("price") as string)
       : null,
+    paid_by: (formData.get("paid_by") as string) || null,
     place_name: (formData.get("place_name") as string) || null,
   });
 
@@ -121,6 +122,7 @@ export async function updateActivity(formData: FormData) {
       price: formData.get("price")
         ? parseFloat(formData.get("price") as string)
         : null,
+      paid_by: (formData.get("paid_by") as string) || null,
       place_name: (formData.get("place_name") as string) || null,
     })
     .eq("id", id);

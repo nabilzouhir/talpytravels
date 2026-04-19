@@ -6,12 +6,14 @@ import GoogleMapsProvider from "./GoogleMapsProvider";
 import ActivitiesTab from "./tabs/ActivitiesTab";
 import ItineraryTab from "./tabs/ItineraryTab";
 import MapTab from "./tabs/MapTab";
+import ExpensesTab from "./tabs/ExpensesTab";
 import PhotosTab from "./tabs/PhotosTab";
 
 const TABS = [
   { key: "activities", label: "Attività" },
   { key: "itinerary", label: "Itinerario" },
   { key: "mappa", label: "Mappa" },
+  { key: "expenses", label: "Spese" },
   { key: "photos", label: "Foto" },
 ] as const;
 
@@ -67,6 +69,7 @@ export default function DestinationTabs({
           />
         )}
         {activeTab === "mappa" && <MapTab activities={activities} />}
+        {activeTab === "expenses" && <ExpensesTab activities={activities} />}
         {activeTab === "photos" && (
           <PhotosTab destinationId={destinationId} photos={photos} />
         )}
