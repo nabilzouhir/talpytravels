@@ -31,6 +31,7 @@ CREATE TABLE activities (
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
   price DOUBLE PRECISION,
+  paid_by TEXT CHECK (paid_by IN ('pesciolino', 'talpina')),
   place_name TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

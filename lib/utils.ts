@@ -68,6 +68,16 @@ export const STATUS_LABELS: Record<string, string> = {
   visited: "Visitato",
 };
 
+export const PAYER_LABELS: Record<string, string> = {
+  pesciolino: "Pesciolino",
+  talpina: "Talpina",
+};
+
+export const PAYER_ICONS: Record<string, string> = {
+  pesciolino: "🐟",
+  talpina: "🐾",
+};
+
 export const STATUS_COLORS: Record<string, string> = {
   wishlist:
     "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",

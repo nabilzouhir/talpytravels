@@ -1,5 +1,7 @@
 export type DestinationStatus = "wishlist" | "planned" | "visited";
 
+export type Payer = "pesciolino" | "talpina";
+
 export type ActivityCategory =
   | "food"
   | "sightseeing"
@@ -33,6 +35,7 @@ export interface Activity {
   done: boolean;
   day_number: number | null;
   price: number | null;
+  paid_by: Payer | null;
   latitude: number | null;
   longitude: number | null;
   place_name: string | null;

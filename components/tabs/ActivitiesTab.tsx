@@ -8,7 +8,7 @@ import {
   toggleActivity,
   deleteActivity,
 } from "@/lib/actions";
-import { CATEGORY_LABELS, CATEGORY_ICONS } from "@/lib/utils";
+import { CATEGORY_LABELS, CATEGORY_ICONS, PAYER_LABELS, PAYER_ICONS } from "@/lib/utils";
 import PlacePicker from "@/components/PlacePicker";
 
 interface Props {
@@ -163,6 +163,20 @@ export default function ActivitiesTab({ destinationId, activities, budget }: Pro
             />
           </div>
         </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            Pagato da (opzionale)
+          </label>
+          <select
+            name="paid_by"
+            defaultValue={editingActivity?.paid_by ?? ""}
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+          >
+            <option value="">— Nessuno —</option>
+            <option value="pesciolino">{PAYER_ICONS.pesciolino} {PAYER_LABELS.pesciolino}</option>
+            <option value="talpina">{PAYER_ICONS.talpina} {PAYER_LABELS.talpina}</option>
+          </select>
+        </div>
         <PlacePicker
           defaultPlaceName={editingActivity?.place_name}
           defaultLatitude={editingActivity?.latitude}
@@ -299,6 +313,9 @@ export default function ActivitiesTab({ destinationId, activities, budget }: Pro
                     {activity.price != null && activity.price > 0 && (
                       <span className="text-xs text-gray-400 dark:text-gray-500">
                         💰 €{activity.price.toFixed(2)}
+                        {activity.paid_by && (
+                          <> · {PAYER_ICONS[activity.paid_by]} {PAYER_LABELS[activity.paid_by]}</>
+                        )}
                       </span>
                     )}
                   </div>
