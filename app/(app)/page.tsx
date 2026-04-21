@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase-server";
+import { autoCompleteFinishedTrips } from "@/lib/actions";
 import type { Destination } from "@/lib/types";
 import DestinationsList from "@/components/DestinationsList";
 
 export default async function HomePage() {
+  // Auto-promote any `planned` trip whose end_date is in the past to `visited`
+  await autoCompleteFinishedTrips();
+
   const supabase = createClient();
 
   const { data: destinations } = await supabase

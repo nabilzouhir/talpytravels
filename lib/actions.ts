@@ -4,6 +4,29 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 
+// ─── Auto-status transitions ─────────────────────────────
+
+/**
+ * Promotes any `planned` destinations whose `end_date` is in the past to
+ * `visited`. Safe to call on every page render — it's a single indexed UPDATE.
+ */
+export async function autoCompleteFinishedTrips() {
+  const supabase = createClient();
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const { error } = await supabase
+    .from("destinations")
+    .update({ status: "visited" })
+    .eq("status", "planned")
+    .lt("end_date", today);
+
+  // Silently ignore errors here — this is a best-effort background task and
+  // must not break page rendering.
+  if (error) {
+    console.error("[autoCompleteFinishedTrips]", error.message);
+  }
+}
+
 // ─── Destinations ────────────────────────────────────────
 
 export async function createDestination(formData: FormData) {
