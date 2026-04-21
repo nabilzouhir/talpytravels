@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
+import { autoCompleteFinishedTrips } from "@/lib/actions";
 import { formatDateRangeIT, STATUS_COLORS, STATUS_LABELS } from "@/lib/utils";
 import DestinationTabs from "@/components/DestinationTabs";
 
@@ -9,6 +10,9 @@ export default async function DestinationDetailPage({
 }: {
   params: { id: string };
 }) {
+  // Auto-promote any `planned` trip whose end_date is in the past to `visited`
+  await autoCompleteFinishedTrips();
+
   const supabase = createClient();
 
   const [
